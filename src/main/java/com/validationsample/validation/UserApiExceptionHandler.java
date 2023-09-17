@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
-public class CustomResponseEntityExceptionHandler {
+public class UserApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -29,6 +29,34 @@ public class CustomResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    /**
+     * エラーレスポンスのクラス
+     */
+    public static final class ErrorResponse {
+        private final HttpStatus status;
+        private final String message;
+        private final List<Map<String, String>> errors;
+
+        public ErrorResponse(HttpStatus status, String message, List<Map<String, String>> errors) {
+            this.status = status;
+            this.message = message;
+            this.errors = errors;
+        }
+
+        public HttpStatus getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public List<Map<String, String>> getErrors() {
+            return errors;
+        }
+
+    }
+
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         List<Map<String, String>> errors = new ArrayList<>();
@@ -38,9 +66,5 @@ public class CustomResponseEntityExceptionHandler {
         ErrorResponse errorResponse =
                 new ErrorResponse(HttpStatus.BAD_REQUEST, "validation error", errors);
         return ResponseEntity.badRequest().body(errorResponse);
-    }
-
-    public record ErrorResponse(HttpStatus status, String message, List<Map<String, String>> errors) {
-
     }
 }
