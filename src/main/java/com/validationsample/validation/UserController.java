@@ -15,8 +15,8 @@ import java.util.Map;
 public class NameController {
 
     @PostMapping("/names")
-    public Map<String, String> names(@RequestBody @Validated NameForm nameForm) {
-        return Map.of("message", "name successfully created");
+    public Map<String, String> names(@RequestBody @Validated UserRequest userRequest) {
+        return Map.of("message", "successfully created");
     }
 
     @GetMapping("/names")
