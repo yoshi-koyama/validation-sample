@@ -177,33 +177,14 @@ givenNameとfamilyNameは必須項目とし、nullや空文字、スペースの
 jsonに対応した以下のようなクラスを作成します。  
 @NotBlankアノテーションを使用して、givenNameとfamilyNameがnullまたは空でないことを検証します。
 
-```java
-public class UserRequest {
-    @NotBlank
-    private String givenName;
-    @NotBlank
-    private String familyName;
-
-    // getter
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserPostRequest.java#L5-L26  
 
 ## コントローラの作成
 
 /usersのPOSTリクエストを受け付けるためのコントローラを作成します。
 リクエストボディに@Validアノテーションを使用して、バリデーションを実行します。
 
-```java
-
-@RestController
-public class UserController {
-    @PostMapping("/users")
-    public ResponseEntity<Map<String, String>> createUser(@Valid @RequestBody UserRequest userRequest) {
-        // 登録処理は省略
-        return Map.of("message", "successfully created");
-    }
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserController.java#L13-L19
 
 ## 動作確認
 
@@ -235,37 +216,7 @@ Resolved [org.springframework.web.bind.MethodArgumentNotValidException
 
 @ExceptionHandlerアノテーションと@ControllerAdviceアノテーションを使用して、MethodArgumentNotValidExceptionをハンドリングします。
 
-```java
-
-@RestControllerAdvice
-public class UserApiExceptionHandler {
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        List<Map<String, String>> errors = new ArrayList<>();
-        e.getBindingResult().getFieldErrors().forEach(fieldError -> {
-            Map<String, String> error = new HashMap<>();
-            error.put("field", fieldError.getField());
-            error.put("message", fieldError.getDefaultMessage());
-            errors.add(error);
-        });
-        ErrorResponse errorResponse =
-                new ErrorResponse(HttpStatus.BAD_REQUEST, "validation error", errors);
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
-
-    /**
-     * エラーレスポンスのクラス
-     */
-    public static final class ErrorResponse {
-        private final HttpStatus status;
-        private final String message;
-        private final List<Map<String, String>> errors;
-
-        // constructor, getter
-    }
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserApiExceptionHandler.java#L15-L58
 
 ## 動作確認
 
@@ -317,81 +268,13 @@ Dload  Upload   Total   Spent    Left  Speed
 
 MockMvcを使用したテストコードを実装します。
 
-```java
-
-@AutoConfigureMockMvc
-@SpringBootTest
-class UserControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    @Test
-    public void ユーザー登録時にgivenNameとfamilyNameがnullの場合は400エラーとなること() throws Exception {
-        UserPostRequest userRequest = new UserPostRequest(null, null);
-        ResultActions actual = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsString(userRequest)));
-        actual.andExpect(status().isBadRequest())
-                .andExpect(content().json("""
-                        {
-                          "status": "BAD_REQUEST",
-                          "message": "validation error",
-                          "errors": [
-                            {
-                              "field": "familyName",
-                              "message": "must not be blank"
-                            },
-                            {
-                              "field": "givenName",
-                              "message": "must not be blank"
-                            }
-                          ]
-                        }
-                        """));
-    }
-
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/test/java/com/validationsample/validation/UserControllerTest.java#L16-L50
 
 このようにテストコードを実装することで、バリデーションエラー時のレスポンスが正しいことを確認することができます。  
 ただ、すべてのパターンの入力値をテストしてしまうとUserControllerTestクラスが肥大化してしまいます。  
 そこで、パラメータのバリデーションはFormのクラスの単体試験としてテストすることにします。
 
-```java
-class UserPostRequestTest {
-
-    private static Validator validator;
-
-    @BeforeAll
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-
-    @Test
-    public void givenNameとfamilyNameがnullのときにバリデーションエラーとなること() {
-        UserPostRequest userPostRequest = new UserPostRequest(null, null);
-        Set<ConstraintViolation<UserPostRequest>> violations = validator.validate(userPostRequest);
-        assertThat(violations).hasSize(2);
-        assertThat(violations)
-                .extracting(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage)
-                .containsExactlyInAnyOrder(tuple("givenName", "空白は許可されていません"), tuple("familyName", "空白は許可されていません"));
-    }
-
-    @Test
-    public void givenNameとfamilyNameが空文字のときにバリデーションエラーとなること() {
-        UserPostRequest userPostRequest = new UserPostRequest("", "");
-        Set<ConstraintViolation<UserPostRequest>> violations = validator.validate(userPostRequest);
-        assertThat(violations).hasSize(2);
-        assertThat(violations)
-                .extracting(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage)
-                .containsExactlyInAnyOrder(tuple("givenName", "空白は許可されていません"), tuple("familyName", "空白は許可されていません"));
-    }
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/test/java/com/validationsample/validation/UserPostRequestTest.java#L15-L49
 
 ## その他のバリデーションアノテーションを利用した実装
 
@@ -405,7 +288,7 @@ class UserPostRequestTest {
 
 こういった相関項目チェックは、@AssertTrueを使うことで実装することができます。
 
-// sample
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserPatchRequest.java#L5-L33
 
 他にも相関項目チェックは下記のようなユースケースがあります。
 
@@ -428,22 +311,7 @@ class UserPostRequestTest {
 
 バリデーションアノテーションの定義クラスは、@Constraintアノテーションを付与して定義します。
 
-// sample
-
-```java
-
-@Target({ElementType.METHOD, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {EmailValidator.class})
-public @interface Email {
-
-    String message() default "メールアドレスの形式が不正です";
-
-    Class<?>[] groups() default {};
-
-    Class<? extends Payload>[] payload() default {};
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/SampleForm.java#L86-L99
 
 @Targetアノテーションで、バリデーションアノテーションを付与できる対象を指定します。
 @Retentionアノテーションで、バリデーションアノテーションの有効期間を指定します。
@@ -453,22 +321,7 @@ public @interface Email {
 
 バリデーションアノテーションのバリデータクラスは、ConstraintValidatorインターフェースを実装して定義します。
 
-```java
-public class EmailValidator implements ConstraintValidator<Email, String> {
-
-    @Override
-    public void initialize(Email constraintAnnotation) {
-    }
-
-    @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
-        return value.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
-    }
-}
-```
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/SampleForm.java#L101-L123
 
 ConstraintValidatorインターフェースのジェネリクスには、バリデーションアノテーションの定義クラスとバリデート対象の値の型を指定します。
 
@@ -479,7 +332,7 @@ public class カスタムバリデータのクラス名 implements ConstraintVal
 バリデーションアノテーションのバリデータクラスでは、isValidメソッドを実装します。
 
 ```java
-boolean isValid(バリデート対象の値の型 value,ConstraintValidatorContext context);
+boolean isValid(バリデート対象の値の型 value, ConstraintValidatorContext context);
 ```
 
 isValidメソッドの第1引数には、バリデーション対象のフィールドの値が渡されます。
