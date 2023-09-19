@@ -313,6 +313,197 @@ Dload  Upload   Total   Spent    Left  Speed
 
 エラーレスポンスをカスタマイズして、バリデーションエラーのメッセージを返却することができました。
 
+## テストコードの実装
+
+MockMvcを使用したテストコードを実装します。
+
+```java
+
+@AutoConfigureMockMvc
+@SpringBootTest
+class UserControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Test
+    public void ユーザー登録時にgivenNameとfamilyNameがnullの場合は400エラーとなること() throws Exception {
+        UserPostRequest userRequest = new UserPostRequest(null, null);
+        ResultActions actual = mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsString(userRequest)));
+        actual.andExpect(status().isBadRequest())
+                .andExpect(content().json("""
+                        {
+                          "status": "BAD_REQUEST",
+                          "message": "validation error",
+                          "errors": [
+                            {
+                              "field": "familyName",
+                              "message": "must not be blank"
+                            },
+                            {
+                              "field": "givenName",
+                              "message": "must not be blank"
+                            }
+                          ]
+                        }
+                        """));
+    }
+
+}
+```
+
+このようにテストコードを実装することで、バリデーションエラー時のレスポンスが正しいことを確認することができます。  
+ただ、すべてのパターンの入力値をテストしてしまうとUserControllerTestクラスが肥大化してしまいます。  
+そこで、パラメータのバリデーションはFormのクラスの単体試験としてテストすることにします。
+
+```java
+class UserPostRequestTest {
+
+    private static Validator validator;
+
+    @BeforeAll
+    public static void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void givenNameとfamilyNameがnullのときにバリデーションエラーとなること() {
+        UserPostRequest userPostRequest = new UserPostRequest(null, null);
+        Set<ConstraintViolation<UserPostRequest>> violations = validator.validate(userPostRequest);
+        assertThat(violations).hasSize(2);
+        assertThat(violations)
+                .extracting(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage)
+                .containsExactlyInAnyOrder(tuple("givenName", "空白は許可されていません"), tuple("familyName", "空白は許可されていません"));
+    }
+
+    @Test
+    public void givenNameとfamilyNameが空文字のときにバリデーションエラーとなること() {
+        UserPostRequest userPostRequest = new UserPostRequest("", "");
+        Set<ConstraintViolation<UserPostRequest>> violations = validator.validate(userPostRequest);
+        assertThat(violations).hasSize(2);
+        assertThat(violations)
+                .extracting(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage)
+                .containsExactlyInAnyOrder(tuple("givenName", "空白は許可されていません"), tuple("familyName", "空白は許可されていません"));
+    }
+}
+```
+
+## その他のバリデーションアノテーションを利用した実装
+
+@NotBlank以外にも様々なバリデーションアノテーションを利用した実装とテストのサンプルコードを用意しました。
+
+### @AssertTrueを使った相関項目チェック
+
+@NotBlankではフィールド単項目のチェックしかできませんが、@AssertTrueを使うことで相関項目のチェックを実装することができます。
+
+たとえば、givenNameとfamilyNameを更新するときに、どちらも空文字の場合はエラーとするような場合です。
+
+こういった相関項目チェックは、@AssertTrueを使うことで実装することができます。
+
+// sample
+
+他にも相関項目チェックは下記のようなユースケースがあります。
+
+- パスワードの確認
+  パスワードとパスワードの確認フィールドが一致していない場合にエラーを表示する。
+- 年齢による購入制限
+  未成年の場合に購入できない商品の場合にエラーを表示する。
+- 日付範囲の妥当性チェック
+  開始日と終了日の範囲が、終了日 < 開始日となっている場合にエラーを表示する。
+
+### カスタムバリデーションアノテーションを使った実装
+
+すでに定義されているバリデーションアノテーションでは実装できないバリデーションを実装する場合は、カスタムバリデーションアノテーションを定義することで実装することができます。
+カスタムバリデーションアノテーションを定義するには、下記の2つのクラスを作成する必要があります。
+
+- バリデーションアノテーションの定義クラス
+- バリデーションアノテーションのバリデータクラス
+
+#### バリデーションアノテーションの定義クラス
+
+バリデーションアノテーションの定義クラスは、@Constraintアノテーションを付与して定義します。
+
+// sample
+
+```java
+
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = {EmailValidator.class})
+public @interface Email {
+
+    String message() default "メールアドレスの形式が不正です";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+}
+```
+
+@Targetアノテーションで、バリデーションアノテーションを付与できる対象を指定します。
+@Retentionアノテーションで、バリデーションアノテーションの有効期間を指定します。
+@Constraintアノテーションで、バリデーションアノテーションのバリデータクラスを指定します。
+
+#### バリデーションアノテーションのバリデータクラス
+
+バリデーションアノテーションのバリデータクラスは、ConstraintValidatorインターフェースを実装して定義します。
+
+```java
+public class EmailValidator implements ConstraintValidator<Email, String> {
+
+    @Override
+    public void initialize(Email constraintAnnotation) {
+    }
+
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
+        return value.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+    }
+}
+```
+
+ConstraintValidatorインターフェースのジェネリクスには、バリデーションアノテーションの定義クラスとバリデート対象の値の型を指定します。
+
+```java
+public class カスタムバリデータのクラス名 implements ConstraintValidator<バリデーションアノテーションの定義クラス名, バリデート対象の値の型>
+```
+
+バリデーションアノテーションのバリデータクラスでは、isValidメソッドを実装します。
+
+```java
+boolean isValid(バリデート対象の値の型 value,ConstraintValidatorContext context);
+```
+
+isValidメソッドの第1引数には、バリデーション対象のフィールドの値が渡されます。
+isValidメソッドの第2引数には、バリデーションのコンテキストが渡されます。
+バリデーションのコンテキストでは、バリデーションの結果を設定したり、バリデーションのメッセージを設定したりすることができます。
+
+### カスタムバリデーションアノテーションの利用例
+
+バリデーションアノテーションをカスタマイズしてできることとしては下記のようなものがあります。
+
+- 登録したいTODOのステータスがTODOかIN_PROGRESSのいずれかであることをチェックする
+- そのサービス独自のパスワードのルールを満たしているかチェックする
+- 宿の予約人数が、部屋の定員を超えていないかチェックする
+
+また、@AssertTrueアノテーションを使ったチェックの事例を、バリデーションアノテーションをカスタマイズして実装することもできます。
+
+## まとめ
+
+Spring Bootでは、Jakarta Bean Validationの実装としてHibernate Validatorが利用されています。  
+Hibernate Validatorは、Bean Validationの実装の1つであり、Bean Validationの仕様に準拠しています。
+
+Jakarta Bean ValidationとHibernate Validatorの仕様を理解し、それらがどのようにSpring Bootで利用されているかを理解することで、Spring
+Bootでバリデーションを実装することができます。
+
 # 参考ドキュメント
 
 ## Java Bean Validationの公式ドキュメント

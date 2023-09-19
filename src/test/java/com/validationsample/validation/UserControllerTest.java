@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// MockMvcを使うために必要なimport文
 @AutoConfigureMockMvc
 @SpringBootTest
 class UserControllerTest {
