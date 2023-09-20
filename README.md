@@ -116,10 +116,10 @@ Bean Validationは、Javaの標準仕様で、Hibernate ValidatorはBean Validat
 
 ### その他
 
-その他のバリデーションアノテーションについては、以下のドキュメントを参照してください。
-https://jakarta.ee/specifications/bean-validation/3.0/apidocs/
-https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints
-https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-defineconstraints-spec
+その他のバリデーションアノテーションについては、以下のドキュメントを参照してください。  
+https://jakarta.ee/specifications/bean-validation/3.0/apidocs/  
+https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints  
+https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-defineconstraints-spec  
 
 Bean Validation 一覧 で調べるのもよいですね。
 
@@ -361,17 +361,17 @@ Bootでバリデーションを実装することができます。
 
 ## Java Bean Validationの公式ドキュメント
 
-https://beanvalidation.org/
-Jakarta Bean Validationの公式サイトです。
-こちらの記事のプレゼン資料がわかりやすい。
-https://beanvalidation.org/news/2018/02/26/bean-validation-2-0-whats-in-it/
+https://beanvalidation.org/  
+Jakarta Bean Validationの公式サイトです。  
+こちらの記事のプレゼン資料がわかりやすい。  
+https://beanvalidation.org/news/2018/02/26/bean-validation-2-0-whats-in-it/  
 
 ## Hibernate Validatorの公式ドキュメント
 
-https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#preface
+https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#preface  
 
 ## SpringでのJakarta Bean Validationの実装方法紹介記事
 
-https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
-Springの公式ドキュメントで簡単にバリデーションを実装する方法が説明されています。
-サラッと重要なことが書いてあるので、読んでおくと良いと思います。
+https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html  
+Springの公式ドキュメントで簡単にバリデーションを実装する方法が説明されています。  
+サラッと重要なことが書いてあるので、読んでおくと良いと思います。  
