@@ -119,7 +119,7 @@ Bean Validationは、Javaの標準仕様で、Hibernate ValidatorはBean Validat
 その他のバリデーションアノテーションについては、以下のドキュメントを参照してください。  
 https://jakarta.ee/specifications/bean-validation/3.0/apidocs/  
 https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints  
-https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-defineconstraints-spec  
+https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-defineconstraints-spec
 
 Bean Validation 一覧 で調べるのもよいですね。
 
@@ -177,7 +177,7 @@ givenNameとfamilyNameは必須項目とし、nullや空文字、スペースの
 jsonに対応した以下のようなクラスを作成します。  
 @NotBlankアノテーションを使用して、givenNameとfamilyNameがnullまたは空でないことを検証します。
 
-https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserPostRequest.java#L5-L26  
+https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserPostRequest.java#L5-L26
 
 ## コントローラの作成
 
@@ -185,6 +185,9 @@ https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441f
 リクエストボディに@Validアノテーションを使用して、バリデーションを実行します。
 
 https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441fb051fa3f9ca8c83/src/main/java/com/validationsample/validation/UserController.java#L13-L19
+
+ちなみにGETリクエストのクエリ文字列に対するバリデーションも同様に実装できます。  
+ただし、@RequestParamアノテーションを使用する場合はControllerクラスに@Validatedアノテーションを追加するなど実装方法が異なります。
 
 ## 動作確認
 
@@ -332,7 +335,7 @@ public class カスタムバリデータのクラス名 implements ConstraintVal
 バリデーションアノテーションのバリデータクラスでは、isValidメソッドを実装します。
 
 ```java
-boolean isValid(バリデート対象の値の型 value, ConstraintValidatorContext context);
+boolean isValid(バリデート対象の値の型 value,ConstraintValidatorContext context);
 ```
 
 isValidメソッドの第1引数には、バリデーション対象のフィールドの値が渡されます。
@@ -364,11 +367,11 @@ Bootでバリデーションを実装することができます。
 https://beanvalidation.org/  
 Jakarta Bean Validationの公式サイトです。  
 こちらの記事のプレゼン資料がわかりやすい。  
-https://beanvalidation.org/news/2018/02/26/bean-validation-2-0-whats-in-it/  
+https://beanvalidation.org/news/2018/02/26/bean-validation-2-0-whats-in-it/
 
 ## Hibernate Validatorの公式ドキュメント
 
-https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#preface  
+https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#preface
 
 ## SpringでのJakarta Bean Validationの実装方法紹介記事
 
