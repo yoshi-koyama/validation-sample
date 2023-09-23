@@ -367,7 +367,15 @@ private Integer age;
 ```
 
 このようにすればたしかに実装はできますが、年齢のチェックを行うアノテーションを作成したほうが、コードの可読性が高くなります。  
-また、年齢に関するチェック処理を1つにまとめることで、年齢に関するチェック処理の変更が発生した場合に、変更箇所が1箇所になるため、変更の影響範囲を把握しやすくなります。
+また、年齢に関するチェック処理を1つにまとめることで、年齢に関するチェック処理の変更が発生した場合に、変更箇所が1箇所になるため、変更の影響範囲を把握しやすくなります。  
+
+https://github.com/yoshi-koyama/validation-sample/blob/1c4312455701892f8045cf63f8ee062a6f825981/src/main/java/com/validationsample/validation/ValidVisaAge.java#L15-L29  
+
+https://github.com/yoshi-koyama/validation-sample/blob/33fcc45a895c6a093f491dffd4c32d5bf21fdeaf/src/main/java/com/validationsample/validation/VisaApplicationForm.java#L8-L12  
+
+テストコードはこちら。  
+
+https://github.com/yoshi-koyama/validation-sample/blob/33fcc45a895c6a093f491dffd4c32d5bf21fdeaf/src/test/java/com/validationsample/validation/VisaApplicationFormTest.java#L13-L31  
 
 ## まとめ
 
