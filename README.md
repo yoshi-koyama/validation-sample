@@ -188,8 +188,10 @@ https://github.com/yoshi-koyama/validation-sample/blob/10e253da416d2f500b9f1441f
 
 ちなみにGETリクエストのクエリ文字列に対するバリデーションも同様に実装できます。  
 https://github.com/yoshi-koyama/validation-sample/blob/f0a64ad584cddb6652ecbcb4ae02e9d364e33f38/src/main/java/com/validationsample/validation/UserController.java#L22  
-https://github.com/yoshi-koyama/validation-sample/blob/f0a64ad584cddb6652ecbcb4ae02e9d364e33f38/src/main/java/com/validationsample/validation/UserGetQueryParam.java#L5  
-ただし、@RequestParamアノテーションを使用する場合はControllerクラスに@Validatedアノテーションを追加するなど実装方法が異なります。  
+https://github.com/yoshi-koyama/validation-sample/blob/f0a64ad584cddb6652ecbcb4ae02e9d364e33f38/src/main/java/com/validationsample/validation/UserGetQueryParam.java#L5
+
+> **Warning**
+> @RequestParamアノテーションを使用する場合はControllerクラスに@Validatedアノテーションを追加しなければならず、実装方法が異なります。
 
 ## 動作確認
 
