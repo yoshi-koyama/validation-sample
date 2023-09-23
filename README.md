@@ -192,6 +192,8 @@ https://github.com/yoshi-koyama/validation-sample/blob/f0a64ad584cddb6652ecbcb4a
 
 > **Warning**
 > @RequestParamアノテーションを使用する場合はControllerクラスに@Validatedアノテーションを追加しなければならず、実装方法が異なります。
+> @ValidアノテーションはJakarta Bean Validationで定義されています。
+> 一方、@Validatedは@Validを拡張したSpringの機能です。
 
 ## 動作確認
 
