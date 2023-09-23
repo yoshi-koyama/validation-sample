@@ -6,7 +6,7 @@ package com.validationsample.validation;
 public class VisaApplicationForm {
 
     /**
-     * 名前
+     * 年齢
      */
     @ValidVisaAge
     private Integer age;
