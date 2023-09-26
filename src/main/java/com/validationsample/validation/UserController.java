@@ -14,17 +14,17 @@ import java.util.Map;
 public class UserController {
 
     @PostMapping("/users")
-    public Map<String, String> names(@RequestBody @Validated UserPostRequest userRequest) {
+    public Map<String, String> users(@RequestBody @Validated UserPostRequest userRequest) {
         return Map.of("message", "successfully created");
     }
 
     @GetMapping("/users")
-    public Map<String, String> names(@Valid UserGetQueryParam userGetQueryParam) {
+    public Map<String, String> users(@Valid UserGetQueryParam userGetQueryParam) {
         return Map.of("message", "name successfully fetched");
     }
 
     @PatchMapping("/users")
-    public Map<String, String> names(@RequestBody @Valid UserPatchRequest userPatchRequest) {
+    public Map<String, String> users(@RequestBody @Valid UserPatchRequest userPatchRequest) {
         return Map.of("message", "successfully updated");
     }
 }
