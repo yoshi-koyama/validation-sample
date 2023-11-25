@@ -21,14 +21,13 @@ public class UserPatchRequest {
         return familyName;
     }
 
-    @AssertTrue(message = "givenNameかfamilyNameが空白です")
-    public boolean isGivenNameOrFamilyNameNotBlank() {
-        // givenNameかfamilyNameがnullまたは空文字または半角スペースのときにfalseを返す
-        if (givenName == null || familyName == null) {
+    @AssertTrue(message = "givenNameとfamilyNameの両方が空白です")
+    public boolean isBothGivenNameAndFamilyNameNotBlank() {
+        // givenNameとfamilyNameの全てがnullまたは空文字または半角スペースのときにfalseを返す
+        if ((givenName == null || givenName.isBlank()) && (familyName == null || familyName.isBlank())) {
             return false;
-        } else if (givenName.isBlank() || familyName.isBlank()) {
-            return false;
+        } else {
+            return true;
         }
-        return true;
     }
 }
