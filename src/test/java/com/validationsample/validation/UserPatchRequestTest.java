@@ -140,7 +140,7 @@ class UserPatchRequestTest {
     }
 
     @Test
-    public void familyNameがnullのときにバリデーションエラーとならないこと() {
+    public void familyNameのみがnullのときにバリデーションエラーとならないこと() {
         UserPatchRequest userPatchRequest = new UserPatchRequest("givenName", null);
 
         Set<ConstraintViolation<UserPatchRequest>> violations = validator.validate(userPatchRequest);
@@ -149,7 +149,7 @@ class UserPatchRequestTest {
     }
 
     @Test
-    public void givenNameが空文字のときにバリデーションエラーとならないこと() {
+    public void givenNameのみが空文字のときにバリデーションエラーとならないこと() {
         UserPatchRequest userPatchRequest = new UserPatchRequest("", "familyName");
 
         Set<ConstraintViolation<UserPatchRequest>> violations = validator.validate(userPatchRequest);
@@ -158,7 +158,7 @@ class UserPatchRequestTest {
     }
 
     @Test
-    public void familyNameが空文字のときにバリデーションエラーとならないこと() {
+    public void familyNameのみが空文字のときにバリデーションエラーとならないこと() {
         UserPatchRequest userPatchRequest = new UserPatchRequest("givenName", "");
 
         Set<ConstraintViolation<UserPatchRequest>> violations = validator.validate(userPatchRequest);
@@ -167,7 +167,7 @@ class UserPatchRequestTest {
     }
 
     @Test
-    public void givenNameが半角スペースのみのときにバリデーションエラーとならないこと() {
+    public void givenNameのみが半角スペースのみのときにバリデーションエラーとならないこと() {
         UserPatchRequest userPatchRequest = new UserPatchRequest(" ", "familyName");
 
         Set<ConstraintViolation<UserPatchRequest>> violations = validator.validate(userPatchRequest);
@@ -176,7 +176,7 @@ class UserPatchRequestTest {
     }
 
     @Test
-    public void familyNameが半角スペースのみのときにバリデーションエラーとならないこと() {
+    public void familyNameのみが半角スペースのみのときにバリデーションエラーとならないこと() {
         UserPatchRequest userPatchRequest = new UserPatchRequest("givenName", " ");
 
         Set<ConstraintViolation<UserPatchRequest>> violations = validator.validate(userPatchRequest);
